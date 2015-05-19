@@ -1,0 +1,20 @@
+<div class="alert alert-danger" role="alert" ng-show="errorMsg">
+  {{err}} <button ng-click="errorMsg=false">close</button>
+</div>
+<div class="alert alert-success" role="alert" ng-show="successMsg">
+  {{err}} <button ng-click="successMsg=false">close</button>
+</div>
+    <table class="table table-hover">
+      <thead>
+        <th>Belegnummer</th>
+        <th>Tags</th>
+        <th>Buchungsbetrag</th>
+      </thead>
+      <tbody>
+        <tr ng-click="showDetail()" ng-repeat="data in AccFiles | Find:query">
+          <td>{{data.AccData.Belegnummernkreis}}{{data.AccData.Belegnummer}}</td>
+          <td>{{data.FileDoc.CurrTags.join(", ")}}</td>
+          <td>{{data.ACcData.Buchungsbetrag}}</td>
+        </tr>
+      </tbody>
+    </table>
