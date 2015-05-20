@@ -2,7 +2,8 @@
 
 var bebberApp = angular.module("bebber", [
   "ngRoute",
-  "bebberCtrl"
+  "bebberCtrl",
+  "ngPDFViewer",
 ]);
 
 
@@ -13,9 +14,9 @@ bebberApp.config(['$routeProvider',
         templateUrl: '/public/angular-tpls/main.html',
         controller: 'mainCtrl'
       }).
-      when('/detail/:name', {
-        templateUrl: '/public/angular-tpls/detail.html',
-        controller: 'detailCtrl'
+      when('/details/:id', {
+        templateUrl: '/public/angular-tpls/details.html',
+        controller: 'detailsCtrl'
       });
   }]);
 
@@ -23,10 +24,17 @@ bebberApp.filter('Find', function() {
   return function(input, str) {
     var tmp = {};
     angular.forEach(input, function(val, key) {
-      if (val.AccData.Belegnummer.indexOf(str) !== -1) {
+      tmp = val.AccData.Belegnummernkreis + val.AccData.Belegnummer;
+      //console.log(tmp)
+      console.log(val.FileDoc)
+      if (tmp.indexOf(str) !== -1 || val.AccData.Belegnummer === "") {
         tmp[key] = val;
       }
     });
     return tmp;
   };
 })
+
+bebberApp.factory("accData",function(){
+        return {};
+});

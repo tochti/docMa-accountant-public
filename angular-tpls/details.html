@@ -1,0 +1,36 @@
+<div class="container-fluid" style="padding-bottom: 15px">
+  <div class="row">
+    <div class="col-md-3">
+      <button type="button" class="btn btn-default" ng-click="showOverview()">
+        <span class="glyphicon glyphicon-arrow-left"></span>
+      </button>
+    </div>
+    <div class="col-md-9"></div>
+  </div>
+</div>
+<div class="container-fluid">
+<div class="row">
+
+  <div class="col-md-3">
+    <div class="panel panel-default">
+      <div class="panel-heading">Details: </div>
+      <div class="panel-body">
+        <ul class="list-group">
+          <li class="list-group-item">{{details.AccData.Belegnummernkreis}}{{details.AccData.Belegnummer}}</li>
+          <li class="list-group-item">{{details.AccData.Belegdatum}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-9">
+    <button class="btn btn-default" ng-click="prevPage()">&lt;</button>
+    <button class="btn btn-default" ng-click="nextPage()">&gt;</button>
+    <br>
+    <span>{{currentPage}}/{{totalPages}}</span>
+    <br>
+    <pdfviewer src="{{pdfUrl}}" on-page-load='pageLoaded(page,total)' id="viewer"></pdfviewer>
+  </div>
+
+</div>
+</div>

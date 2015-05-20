@@ -9,26 +9,26 @@
     <link href="public/css/my.css" rel="stylesheet" type="text/css">
     <script src="public/ext/jquery/dist/jquery.min.js"></script>
     <script src="public/ext/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="public/ext/pdfjs/pdf.js"></script>
+    <script src="public/ext/pdfjs/compatibility.js"></script>
     <script src="public/ext/angular/angular.min.js"></script>
     <script src="public/ext/angular-route/angular-route.min.js"></script>
     <script src="public/ext/angular-resource/angular-resource.min.js"></script>
+    <script src="public/ext/angular-pdfviewer/ng-pdfviewer.min.js"></script>
     <script src="public/js/main.js"></script>
     <script src="public/js/controller.js"></script>
   </head>
  
-  <body ng-controller="mainCtrl">
+  <body ng-controller="init">
     <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="col-md-2">
-          <button type="button" class="btn btn-default navbar-btn" ng-show="showOverviewBtn">Übersicht</button>
-        </div>
-        <div class="col-md-10">
-          <div class="form-group">
-              <input type="text" class="form-control" placeholder="Belegnummer" ng-model="query">
-          </div>
-        </div>
-      </div>
     </nav>
+
+    <div class="alert alert-danger" role="alert" ng-show="errorMsg">
+      {{err}} <button ng-click="errorMsg=false">close</button>
+    </div>
+    <div class="alert alert-success" role="alert" ng-show="successMsg">
+      {{err}} <button ng-click="successMsg=false">close</button>
+    </div>
 
     <div ng-view></div>
 
