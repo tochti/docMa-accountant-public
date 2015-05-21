@@ -1,20 +1,16 @@
 <table class="table table-hover">
   <thead>
-    <th>Id</th>
     <th>Belegnummer</th>
-    <th>Tags</th>
+    <th>Belegdatum</th>
     <th>Buchungstext</th>
     <th>Buchungsbetrag</th>
-    <th>Datei</th>
   </thead>
   <tbody>
     <tr ng-click="showDetails(data.Id)" ng-repeat="data in accData.data">
-      <td>{{data.Id}}</td>
       <td>{{data.AccData.Belegnummernkreis}}{{data.AccData.Belegnummer}}</td>
-      <td>{{data.FileDoc.CurrTags.join(", ")}}</td>
+      <td>{{data.AccData.Belegdatum | date:'dd.MM.yyyy'}}</td>
       <td>{{data.AccData.Buchungstext}}</td>
-      <td>{{data.AccData.Buchungsbetrag}} {{data.AccData.Waehrung}}</td>
-      <td>{{data.FileDoc.Filename}}</td>
+      <td>{{data.AccData.Buchungsbetrag | currency:data.AccData.Waehrung}}</td>
     </tr>
   </tbody>
 </table>
