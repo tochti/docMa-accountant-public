@@ -26,10 +26,12 @@
   <div class="col-md-9">
     <button class="btn btn-default" ng-click="prevPage()">&lt;</button>
     <button class="btn btn-default" ng-click="nextPage()">&gt;</button>
+    <button class="btn btn-default" ng-click="zoomIn()">+</button>
+    <button class="btn btn-default" ng-click="zoomOut()">-</button>
     <br>
-    <span>{{currentPage}}/{{totalPages}}</span>
+    <span>Seite {{currentPage}} von {{totalPages}}</span>
     <br>
-    <pdfviewer src="{{pdfUrl}}" on-page-load='pageLoaded(page,total)' id="viewer"></pdfviewer>
+    <pdf-viewer delegate-handle="accPdf" url="pdfUrl" scale="1"></pdf-viewer>
   </div>
 
 </div>

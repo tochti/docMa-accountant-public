@@ -3,7 +3,7 @@
 var bebberApp = angular.module("bebber", [
   "ngRoute",
   "bebberCtrl",
-  "ngPDFViewer",
+  "pdf",
 ]);
 
 
@@ -20,7 +20,7 @@ bebberApp.config(['$routeProvider',
       });
   }]);
 
-bebberApp.filter('Find', function() {
+bebberApp.filter('find', function() {
   return function(input, str) {
     var tmp = {};
     angular.forEach(input, function(val, key) {

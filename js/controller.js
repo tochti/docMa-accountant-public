@@ -52,28 +52,41 @@ bebberCtrl.controller('init', function($scope, $http, accData) {
 
 });
 
-bebberCtrl.controller('detailsCtrl', ['$scope', '$routeParams', '$location', 'accData', 'PDFViewerService',
-  function($scope, $routeParams, $location, accData, pdf) {
+bebberCtrl.controller('detailsCtrl', ['$scope', '$routeParams', '$location', 'accData', 'pdfDelegate', '$timeout',
+  function($scope, $routeParams, $location, accData, pdfDelegate, $timeout) {
     $scope.params = $routeParams;
     $scope.accData = accData
     $scope.details = getId($routeParams.id, $scope.accData.data);
     $scope.pdfUrl = '/data/'+ $scope.details.FileDoc.Filename;
-    $scope.viewer = pdf.Instance("viewer");
+    $scope.currentPage = 1;
+
+    $timeout(function() { 
+      $scope.totalPages = pdfDelegate.$getByHandle('accPdf').getPageCount();
+    }, 500);
 
     $scope.nextPage = function() {
-        $scope.viewer.nextPage();
+      var pdfDoc = pdfDelegate.$getByHandle('accPdf')
+      pdfDoc.next();
+      $scope.currentPage = pdfDoc.getCurrentPage();
+      $scope.totalPages = pdfDoc.getPageCount();
     }
 
     $scope.prevPage = function() {
-        $scope.viewer.prevPage();
+      var pdfDoc = pdfDelegate.$getByHandle('accPdf')
+      pdfDoc.prev();
+      $scope.currentPage = pdfDoc.getCurrentPage();
+      $scope.totalPages = pdfDoc.getPageCount();
     }
 
-    $scope.pageLoaded = function(curPage, totalPages) {
-        $scope.currentPage = curPage;
-        $scope.totalPages = totalPages;
+    $scope.zoomIn = function() {
+      pdfDelegate.$getByHandle('accPdf').zoomIn();
     }
 
-    $scope.showOverview = function () {
+    $scope.zoomOut = function() {
+      pdfDelegate.$getByHandle('accPdf').zoomOut();
+    }
+
+    $scope.showOverview = function() {
       $location.path('/');
     }
   }
