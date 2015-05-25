@@ -21,6 +21,14 @@
  
   <body ng-controller="init">
     <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="md-col-6">
+        <form class="navbar-form navbar-left" role="search">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Belegnummer" size="50" ng-model="belegnummer">
+          </div>
+        </form>
+      </div>
+      <button class="btn btn-default navbar-btn" ng-click="sortByDate()">Sortieren nach Datum</button>
     </nav>
 
     <div class="alert alert-danger" role="alert" ng-show="errorMsg">

@@ -14,6 +14,24 @@ var getId = function(id, data) {
 }
 
 bebberCtrl.controller('init', function($scope, $http, accData) {
+  $scope.belegnummer = "";
+
+  $scope.sortByDate = function() {
+    console.log("bydate");
+    $scope.accData = accData;
+    $scope.accData.data.sort(function(a, b) {
+      var aD = a.AccData.Belegdatum;
+      var bD = b.AccData.Belegdatum;
+      if (aD < bD) {
+        return -1;
+      } else if (aD > bD) {
+        return 1;
+      } else {
+        return 0
+      }
+    });
+  }
+
   $http.get('/LoadAccFiles/')
     .success(function (data) {
       if (data.Status === 'fail') {
@@ -62,7 +80,7 @@ bebberCtrl.controller('detailsCtrl', ['$scope', '$routeParams', '$location', 'ac
 
     $timeout(function() { 
       $scope.totalPages = pdfDelegate.$getByHandle('accPdf').getPageCount();
-    }, 500);
+    }, 800);
 
     $scope.nextPage = function() {
       var pdfDoc = pdfDelegate.$getByHandle('accPdf')
@@ -87,17 +105,22 @@ bebberCtrl.controller('detailsCtrl', ['$scope', '$routeParams', '$location', 'ac
     }
 
     $scope.showOverview = function() {
-      $location.path('/');
+      $location.hash('record'+ $routeParams.id);
+      $location.path('/overview');
     }
   }
 ]);
 
-bebberCtrl.controller('mainCtrl', ['$scope', '$location', 'accData',
-  function($scope, $location, accData) {
+bebberCtrl.controller('overviewCtrl', ['$scope', '$location', 'accData', '$anchorScroll',
+  function($scope, $location, accData, $anchorScroll) {
     $scope.errorMsg = false;
     $scope.successMsg = false;
 
-    $scope.showDetails = function (id) {
+    if ($location.hash() !== "") {
+      $anchorScroll();
+    }
+
+    $scope.showDetails = function(id) {
       $location.path('/details/'+ id);
     }
 

@@ -6,11 +6,11 @@
     <th>Buchungsbetrag</th>
   </thead>
   <tbody>
-    <tr ng-click="showDetails(data.Id)" ng-repeat="data in accData.data">
+    <tr id="record{{data.Id}}" ng-click="showDetails(data.Id)" ng-repeat="data in accData.data | find:belegnummer">
       <td>{{data.AccData.Belegnummernkreis}}{{data.AccData.Belegnummer}}</td>
       <td>{{data.AccData.Belegdatum | date:'dd.MM.yyyy'}}</td>
       <td>{{data.AccData.Buchungstext}}</td>
-      <td>{{data.AccData.Buchungsbetrag | euro}}</td>
+      <td><p class="amount">{{data.AccData.Buchungsbetrag | euro}}</p></td>
     </tr>
   </tbody>
 </table>

@@ -6,29 +6,37 @@ var bebberApp = angular.module("bebber", [
   "pdf",
 ]);
 
+bebberApp.run(['$anchorScroll', function($anchorScroll) {
+  $anchorScroll.yOffset = 50;   // always scroll by 50 extra pixels
+}]);
+
 
 bebberApp.config(['$routeProvider',
   function($routeProvider) {
     $routeProvider.
-      when('/', {
-        templateUrl: '/public/angular-tpls/main.html',
-        controller: 'mainCtrl'
+      when('/overview', {
+        templateUrl: '/public/angular-tpls/overview.html',
+        controller: 'overviewCtrl'
       }).
       when('/details/:id', {
         templateUrl: '/public/angular-tpls/details.html',
         controller: 'detailsCtrl'
+      }).
+      otherwise({
+        redirectTo: '/overview',
       });
   }]);
 
 bebberApp.filter('find', function() {
   return function(input, str) {
-    var tmp = {};
+    var tmp = [];
+    if (str === "") {
+      return input;
+    }
     angular.forEach(input, function(val, key) {
-      tmp = val.AccData.Belegnummernkreis + val.AccData.Belegnummer;
-      //console.log(tmp)
-      console.log(val.FileDoc)
-      if (tmp.indexOf(str) !== -1 || val.AccData.Belegnummer === "") {
-        tmp[key] = val;
+      var number = val.AccData.Belegnummernkreis + val.AccData.Belegnummer;
+      if (number.indexOf(str) !== -1) {
+        tmp.push(val);
       }
     });
     return tmp;
