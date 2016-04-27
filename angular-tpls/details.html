@@ -16,27 +16,20 @@
       <div class="panel-heading">Details: </div>
       <div class="panel-body">
         <table class="table">
-          <tr><td>Belegenummer: </td><td>{{details.AccData.Belegnummernkreis}}{{details.AccData.Belegnummer}}</td></tr>
-          <tr><td>Belegdatum: </td><td>{{details.AccData.Belegdatum | date:'dd.MM.yyyy'}}</li></td></tr>
-          <tr><td>Buchungstext: </td><td>{{details.AccData.Buchungstext}}</td></tr>
-          <tr><td>Sollkonto: </td><td>{{details.AccData.Sollkonto}}</td></tr>
-          <tr><td>Habenkonto: </td><td>{{details.AccData.Habenkonto}}</td></tr>
-          <tr><td>Buchungsbetrag: </td><td>{{details.AccData.Buchungsbetrag | euro}}</td></tr>
+          <tr><td>Belegenummer: </td><td>{{tx.doc_number_range}}{{tx.doc_number}}</td></tr>
+          <tr><td>Belegdatum: </td><td>{{tx.doc_date | date:'dd.MM.yyyy'}}</li></td></tr>
+          <tr><td>Buchungstext: </td><td>{{tx.posting_text}}</td></tr>
+          <tr><td>Sollkonto: </td><td>{{tx.debit_account}}</td></tr>
+          <tr><td>Habenkonto: </td><td>{{tx.credit_account}}</td></tr>
+          <tr><td>Buchungsbetrag: </td><td>{{tx.amount_posted | euro}}</td></tr>
         </table>
       </div>
     </div>
   </div>
 
-  <div class="col-md-9">
-    <button class="btn btn-default" ng-click="prevPage()">&lt;</button>
-    <button class="btn btn-default" ng-click="nextPage()">&gt;</button>
-    <button class="btn btn-default" ng-click="zoomIn()">+</button>
-    <button class="btn btn-default" ng-click="zoomOut()">-</button>
-    <br>
-    <span>Seite {{currentPage}} von {{totalPages}}</span>
-    <br>
-    <pdf-viewer delegate-handle="accPdf" url="pdfUrl" scale="1"></pdf-viewer>
-  </div>
+	<div id="fileviewerspace" class="col-md-9">
+		<iframe id="pdfviewer" ng-src="{{ pdfURL }}"></iframe>
+	</div>
 
 </div>
 </div>

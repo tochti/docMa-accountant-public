@@ -1,27 +1,33 @@
 'use strict'
 
+//
+// txs steht für Accounting Transactions
+//
+
+
 var bebberCtrl = angular.module('bebberCtrl', []);
 
-var getId = function(id, data) {
-  var tmp = false;
-  angular.forEach(data, function (val, key) {
-    if (String(val.Id) === id) {
-      tmp = data[key];
+var findTx = function(id, txs) {
+  var tx = undefined;
+  angular.forEach(txs, function(val, key) {
+    if ((val.doc_number_range + val.doc_number) === id) {
+      console.log('-->', val);
+      tx = val;
       return
     }
   });
-  return tmp;
+
+  return tx
 }
 
-bebberCtrl.controller('init', function($scope, $http, accData) {
-  $scope.belegnummer = "";
+bebberCtrl.controller('init', function($scope, $rootScope, $http, txs) {
+
+  $scope.txs = txs;
 
   $scope.sortByDate = function() {
-    console.log("bydate");
-    $scope.accData = accData;
-    $scope.accData.data.sort(function(a, b) {
-      var aD = a.AccData.Belegdatum;
-      var bD = b.AccData.Belegdatum;
+    $scope.txs.sort(function(a, b) {
+      var aD = a.doc_date;
+      var bD = b.doc_date;
       if (aD < bD) {
         return -1;
       } else if (aD > bD) {
@@ -32,97 +38,55 @@ bebberCtrl.controller('init', function($scope, $http, accData) {
     });
   }
 
-  $http.get('/LoadAccFiles/')
-    .success(function (data) {
-      if (data.Status === 'fail') {
-        $scope.errorMsg = true;
-        $scope.err = data.Msg;
-      } else {
-        //console.log(data);
-        for (var x=0;x < data.AccFiles.length;x++) {
-          data.AccFiles[x].FileDoc.CurrTags = [];
-          data.AccFiles[x].Id = x;
-          angular.forEach(data.AccFiles[x].FileDoc.SimpleTags, function (value, key) {
-            data.AccFiles[x].FileDoc.CurrTags.push(value.Tag);
-          });
-          angular.forEach(data.AccFiles[x].FileDoc.ValueTags, function (value, key) {
-            data.AccFiles[x].FileDoc.CurrTags.push(value.Tag +":"+ value.Value);
-          });
-          angular.forEach(data.AccFiles[x].FileDoc.RangeTags, function (value, key) {
-            var sd = value.Start.split("T")[0].split("-");
-            var ed = value.End.split("T")[0].split("-");
-            var sDate = sd[2] + sd[1] + sd[0];
-            var eDate = ed[2] + ed[1] + ed[0];
-            data.AccFiles[x].FileDoc.CurrTags.push(value.Tag +":"+ sDate +".."+ eDate);
-          });
-          data.AccFiles[x].FileDoc.CurrTags.sort()
-        }
-        //$scope.AccFiles = data.AccFiles;
-        //accData = data.AccFiles
-        $scope.accData = accData
-        $scope.accData.data = data.AccFiles
-      }
+  $http.get('/v1/accounting_txs')
+    .then(function(resp) {
+      console.log(resp)
+      angular.forEach(resp.data, function(v, i) {
+        $scope.txs.push(v);
+      })
     })
-    .error(function (data, status) {
-      $scope.errorMsg = true;
-      $scope.err = data;
+    .catch(function(resp) {
+      $rootScope.errorMsg = true;
+      $rootScope.err = resp.message;
     });
 
 });
 
-bebberCtrl.controller('detailsCtrl', ['$scope', '$routeParams', '$location', 'accData', 'pdfDelegate', '$timeout',
-  function($scope, $routeParams, $location, accData, pdfDelegate, $timeout) {
-    $scope.params = $routeParams;
-    $scope.accData = accData
-    $scope.details = getId($routeParams.id, $scope.accData.data);
-    $scope.pdfUrl = '/data/'+ $scope.details.FileDoc.Filename;
-    $scope.currentPage = 1;
+bebberCtrl.controller('detailsCtrl', ['$scope', '$rootScope', '$routeParams', '$http', '$location', '$sce', 'txs', function($scope, $rootScope, $routeParams, $http, $location, $sce, txs) {
+  $http.get('/v1/vouchers?id=' + $routeParams.id)
+    .then(function(resp) {
+      console.log(resp);
+      if (resp.data.length == 0) {
+        throw Error('Cannot find doc');
+      }
+      $scope.doc = resp.data[0];
+      $scope.pdfURL = $sce.trustAsResourceUrl('/pdfviewer/viewer.html?file=/data/' + $scope.doc.name);
+    })
+    .catch(function(resp) {
+      $rootScope.errorMsg = true;
+      $rootScope.err = resp.message;
+    });
 
-    $timeout(function() { 
-      $scope.totalPages = pdfDelegate.$getByHandle('accPdf').getPageCount();
-    }, 800);
+  $scope.tx = findTx($routeParams.id, txs);
 
-    $scope.nextPage = function() {
-      var pdfDoc = pdfDelegate.$getByHandle('accPdf')
-      pdfDoc.next();
-      $scope.currentPage = pdfDoc.getCurrentPage();
-      $scope.totalPages = pdfDoc.getPageCount();
-    }
-
-    $scope.prevPage = function() {
-      var pdfDoc = pdfDelegate.$getByHandle('accPdf')
-      pdfDoc.prev();
-      $scope.currentPage = pdfDoc.getCurrentPage();
-      $scope.totalPages = pdfDoc.getPageCount();
-    }
-
-    $scope.zoomIn = function() {
-      pdfDelegate.$getByHandle('accPdf').zoomIn();
-    }
-
-    $scope.zoomOut = function() {
-      pdfDelegate.$getByHandle('accPdf').zoomOut();
-    }
-
-    $scope.showOverview = function() {
-      $location.hash('record'+ $routeParams.id);
-      $location.path('/overview');
-    }
+  $scope.showOverview = function() {
+    $location.hash('tx' + $routeParams.id);
+    $location.path('/overview');
   }
+}
 ]);
 
-bebberCtrl.controller('overviewCtrl', ['$scope', '$location', 'accData', '$anchorScroll',
-  function($scope, $location, accData, $anchorScroll) {
-    $scope.errorMsg = false;
-    $scope.successMsg = false;
+bebberCtrl.controller('overviewCtrl', ['$scope', '$location', 'txs', '$anchorScroll', function($scope, $location, txs, $anchorScroll) {
+  $scope.errorMsg = false;
+  $scope.successMsg = false;
 
-    if ($location.hash() !== "") {
-      $anchorScroll();
-    }
-
-    $scope.showDetails = function(id) {
-      $location.path('/details/'+ id);
-    }
-
+  if ($location.hash() !== "") {
+    $anchorScroll();
   }
+
+  $scope.showDetails = function(tx) {
+    $location.path('/details/' + tx.doc_number_range + tx.doc_number);
+  }
+
+}
 ]);
