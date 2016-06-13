@@ -11,7 +11,6 @@ var findTx = function(id, txs) {
   var tx = undefined;
   angular.forEach(txs, function(val, key) {
     if ((val.doc_number_range + val.doc_number) === id) {
-      console.log('-->', val);
       tx = val;
       return
     }
@@ -40,34 +39,43 @@ bebberCtrl.controller('init', function($scope, $rootScope, $http, txs) {
 
   $http.get('/v1/accounting_txs')
     .then(function(resp) {
-      console.log(resp)
       angular.forEach(resp.data, function(v, i) {
         $scope.txs.push(v);
       })
     })
     .catch(function(resp) {
       $rootScope.errorMsg = true;
-      $rootScope.err = resp.message;
+      $rootScope.err = resp.data.message;
     });
 
 });
 
 bebberCtrl.controller('detailsCtrl', ['$scope', '$rootScope', '$routeParams', '$http', '$location', '$sce', 'txs', function($scope, $rootScope, $routeParams, $http, $location, $sce, txs) {
-  $http.get('/v1/vouchers?id=' + $routeParams.id)
+  $scope.tx = findTx($routeParams.id, txs);
+  var numb = $scope.tx.doc_number_range + $scope.tx.doc_number
+  var url = '/v1/vouchers?id=' + numb +
+    '&credit_account=' + $scope.tx.credit_account +
+    '&debit_account=' + $scope.tx.debit_account +
+    '&voucher_date=' + $scope.tx.date_of_entry
+  console.log(url)
+  $http.get(url)
     .then(function(resp) {
-      console.log(resp);
       if (resp.data.length == 0) {
         throw Error('Cannot find doc');
       }
       $scope.doc = resp.data[0];
       $scope.pdfURL = $sce.trustAsResourceUrl('/pdfviewer/viewer.html?file=/data/' + $scope.doc.name);
     })
-    .catch(function(resp) {
-      $rootScope.errorMsg = true;
-      $rootScope.err = resp.message;
-    });
+    .catch(function(e) {
+      if (e instanceof Error) {
+        $rootScope.errorMsg = true;
+        $rootScope.err = e.message;
+        return
+      }
 
-  $scope.tx = findTx($routeParams.id, txs);
+      $rootScope.errorMsg = true;
+      $rootScope.err = e.data.message;
+    });
 
   $scope.showOverview = function() {
     $location.hash('tx' + $routeParams.id);
