@@ -56,7 +56,7 @@ bebberCtrl.controller('detailsCtrl', ['$scope', '$rootScope', '$routeParams', '$
   var url = '/v1/vouchers?id=' + numb +
     '&credit_account=' + $scope.tx.credit_account +
     '&debit_account=' + $scope.tx.debit_account +
-    '&voucher_date=' + $scope.tx.date_of_entry
+    '&voucher_date=' + $scope.tx.doc_date
   console.log(url)
   $http.get(url)
     .then(function(resp) {
